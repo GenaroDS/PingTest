@@ -1,6 +1,7 @@
 # PingTest
 
-PingTest is a simple and clean system tray icon that shows you the state of your internet connection with data and coloured icons to reflect its states. It uses multithreading to continuously perform a ping test in the background, with each iteration updating the system tray icon to reflect the current status of the test.
+PingTest is a simple and clean system tray icon that displays the status of your internet connection using colored icons and data. It utilizes multithreading to continuously perform a ping test in the background and updates the system tray icon with the current status of the test after each iteration.
+It should be noted that a packet that takes longer than 150ms to arrive is considered lost. The purpose of this application is to inform the user if their connection is stable enough for activities that require constant and reliable data transfer, such as competitive gaming and other similar activities.
 
 ## What is a Ping Test?
 A ping test is a method used to measure the speed and stability of an internet connection. It works by sending a small packet of data from your computer to a specific server and measuring the time it takes for the server to respond. The result is a measurement of the time it takes for your computer to communicate with the server, which can help identify issues with your internet connection.
