@@ -1,83 +1,104 @@
 import subprocess
 import time
-import sys
 import os
+import threading
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu
+from PIL import Image
+import pystray
 
-#System tray icon method
+# Change system tray icon
 def icon_change(name):
-    icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), name)
-    icon = QIcon(icon_path)
-    tray_icon.setIcon(icon)
+    icon_path = os.path.join(os.path.dirname(os.path.abspath(__name__)), name)
+    image = Image.open(icon_path)
+    tray_icon.icon = image
 
-ping_count = 100
-ping_interval = 1
-minutes_between_pings = 1
-app = QApplication(sys.argv)
+# Handle right click on the system tray icon
+def on_right_click(icon, item):
+        global stop_ping_test
+        stop_ping_test = True
+        icon.stop()
 
-# set the application icon
-icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Icons/Waiting.svg')
-icon = QIcon(icon_path)
-app.setWindowIcon(icon)
+#Define ping test
+def ping_test():
+    while not stop_ping_test:
+        successful_pings = 0
+        packet_loss = 0
+        total_response_time = 0
+        response_times = []
+        response_time = 0  # set default value
+        
+        #Run ping command x amount of times 3 times per second.
+        for i in range(ping_count):
+            result = subprocess.run(['ping', '-n', '1', '-w', '150', 'google.com'], stdout=subprocess.PIPE)
+            if 'Reply from' in str(result.stdout):
+                successful_pings += 1
+                # extract the response time from the output
+                response_time = float(result.stdout.decode('utf-8').split('time=')[1].split('ms')[0])
+                total_response_time += response_time
+                response_times.append(response_time)
+            else:
+                total_response_time += response_time
+                response_times.append(response_time)
+                packet_loss += 1            
+            time.sleep(0.33)
 
-# create a system tray icon
-tray_icon = QSystemTrayIcon(icon, app)
-tray_icon.setVisible(True)
-tray_icon.setToolTip('Testing...')
+        packet_loss_percentage = (packet_loss / ping_count) * 100
 
-
-while True:
-    successful_pings = 0
-    packet_loss = 0
-    total_response_time = 0
-    response_times = []
-
-    for i in range(ping_count):
-        result = subprocess.run(['ping', '-n', '1', '-w', '150', 'google.com'], stdout=subprocess.PIPE)
-        if 'Reply from' in str(result.stdout):
-            successful_pings += 1
-            # extract the response time from the output
-            response_time = float(result.stdout.decode('utf-8').split('time=')[1].split('ms')[0])
-            total_response_time += response_time
-            response_times.append(response_time)
+        #Add packets data to the variables
+        if successful_pings > 0:
+            average_response_time = total_response_time / successful_pings
+            min_response_time = min(response_times)
+            max_response_time = max(response_times)
         else:
-            total_response_time += response_time
-            response_times.append(response_time)
-            packet_loss += 1
+            average_response_time = 0
+            min_response_time = 0
+            max_response_time = 0
 
-        time.sleep(ping_interval/3)
+        # update the tooltip of the system tray icon with the statistics
+        tooltip = f'Packet loss: {packet_loss_percentage:.2f}%\nAverage: {average_response_time:.2f}ms\nMin: {min_response_time:.2f}ms\nMax: {max_response_time:.2f}ms\nSent: {successful_pings + packet_loss}'
+        tray_icon.title = tooltip
 
-    packet_loss_percentage = (packet_loss / ping_count) * 100
+        #Set the system tray icon depending on packet loss percentages
+        if packet_loss_percentage < 9:
+            icon_change('Icons/Perfect.png')
+        elif packet_loss_percentage < 18:
+            icon_change('Icons/Good.png')
+        elif packet_loss_percentage < 28:        
+            icon_change('Icons/Medium.png')
+        else:
+            icon_change('Icons/Bad.png')
 
+        #Restart Variables
+        packet_loss = 0
+        total_response_time = 0
 
-    if successful_pings > 0:
-        average_response_time = total_response_time / successful_pings
-        min_response_time = min(response_times)
-        max_response_time = max(response_times)
-    else:
-        average_response_time = 0
-        min_response_time = 0
-        max_response_time = 0
-
-    # update the tooltip of the system tray icon with the statistics
-    tooltip = f'Packet loss: {packet_loss_percentage:.2f}%\nAverage: {average_response_time:.2f}ms\nMin: {min_response_time:.2f}ms\nMax: {max_response_time:.2f}ms\nSent: {successful_pings + packet_loss}'
-    tray_icon.setToolTip(tooltip)
-
-    if packet_loss_percentage < 9:
-        icon_change('Icons/Perfect.svg')
-    elif packet_loss_percentage < 18:
-        icon_change('Icons/Good.svg')
-    elif packet_loss_percentage < 28:        
-        icon_change('Icons/Medium.svg')
-    else:
-        icon_change('Icons/Bad.svg')
-
-    packet_loss = 0
-    total_response_time = 0
+#Start the ping test thread
+def start_thread(icon):
+    t = threading.Thread(target=ping_test)
+    t.start()
 
 
+# Set up system tray menu
+menu = pystray.Menu(pystray.MenuItem('Exit', on_right_click))
 
-sys.exit(app.exec_())
+#Amount of pings
+ping_count = 100
 
+# Set up system tray icon
+icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Icons/Waiting.png')
+icon = Image.open(icon_path)
+tray_icon = pystray.Icon('Testing', icon, 'Testing...', menu=menu)
+
+# flag to signal the ping_test thread to exit the loop
+stop_ping_test = False
+
+# Start the system tray icon
+threading.Thread(target=start_thread, args=(tray_icon,)).start()
+
+# Run 
+try:
+    tray_icon.run()  # Run the system tray icon loop
+except Exception as e:
+    print(f"Unexpected error occurred: {e}")
+finally:
+    tray_icon.stop()  # Stop the system tray icon loop
