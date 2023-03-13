@@ -14,4 +14,4 @@ Below are some larger and clearer screenshots showcasing the program's system tr
 Each colour represents a different state. Blue means less than 9% of packet loss, green less than 18%, yellow less than 28%, and red more than that. The little clock is the first icon to appear, waiting for the results.
 
 ## Conclusion
-By using PingTest, you can quickly and easily check the stability of your internet connection and identify any issues that may be affecting your connection speed. The program runs in the background, so you can continue using your computer as normal while PingTest works to keep you connected.
+By using PingTest, you can quickly and easily check the stability of your internet connection and identify any issues that may be affecting your connection speed. The program runs in the background, so you can continue using your computer as normal while PingTest works to keep you connected. 
