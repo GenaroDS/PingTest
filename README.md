@@ -1,4 +1,5 @@
 #PingTest
+
 PingTest is a simple and clean system tray icon that shows you the state of your internet connection with data and coloured icons to reflect its states. It uses multithreading to continuously perform a ping test in the background, with each iteration updating the system tray icon to reflect the current status of the test.
 
 ##What is a Ping Test?
