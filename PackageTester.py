@@ -1,6 +1,8 @@
+import ctypes
+import os
+import win32process
 import subprocess
 import time
-import os
 import threading
 import sys
 
@@ -30,7 +32,7 @@ def ping_test():
         
         #Run ping command x amount of times 3 times per second.
         for i in range(ping_count):
-            result = subprocess.run(['ping', '-n', '1', '-w', '150', 'google.com'], stdout=subprocess.PIPE)
+            result = subprocess.run(['ping', '-n', '1', '-w', '150', 'google.com'], stdout=subprocess.PIPE, creationflags = subprocess.CREATE_NO_WINDOW)
             if 'Reply from' in str(result.stdout):
                 successful_pings += 1
                 # extract the response time from the output
