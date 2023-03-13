@@ -8,7 +8,7 @@ A ping test is a method used to measure the speed and stability of an internet c
 ## Screenshots
 Below are some larger and clearer screenshots showcasing the program's system tray colour changing depending on your internet stability:
 
-<img src="Screenshots/Blue circle.jpg" alt="BlueCricle" width="130"> <img src="Screenshots/Green circle.jpg" alt="GreenCircle" width="130"> <img src="Screenshots/Yellow circle.jpg" alt="YellowCircle" width="130"> <img src="Screenshots/Red circle.jpg" alt="RedCircle" width="130"> <img src="Screenshots/Testing.jpg" alt="Testing..." width="130">
+<img src="Screenshots/Blue circle.jpg" alt="BlueCricle"> <img src="Screenshots/Green circle.jpg" alt="GreenCircle"> <img src="Screenshots/Yellow circle.jpg" alt="YellowCircle"> <img src="Screenshots/Red circle.jpg" alt="RedCircle"> <img src="Screenshots/Testing.jpg" alt="Testing...">
 
 Each colour represents a different state. Blue means less than 9% of packet loss, green less than 18%, yellow less than 28%, and red more than that. The little clock is the first icon to appear, waiting for the results.
 
