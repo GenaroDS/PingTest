@@ -2,13 +2,14 @@ import subprocess
 import time
 import os
 import threading
+import sys
 
 from PIL import Image
 import pystray
 
 # Change system tray icon
 def icon_change(name):
-    icon_path = os.path.join(os.path.dirname(os.path.abspath(__name__)), name)
+    icon_path = os.path.join(sys._MEIPASS, name) if hasattr(sys, '_MEIPASS') else name
     image = Image.open(icon_path)
     tray_icon.icon = image
 
@@ -85,7 +86,7 @@ menu = pystray.Menu(pystray.MenuItem('Exit', on_right_click))
 ping_count = 100
 
 # Set up system tray icon
-icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Icons/Waiting.png')
+icon_path = os.path.join(sys._MEIPASS, 'Icons', 'Waiting.png') if hasattr(sys, '_MEIPASS') else 'Icons/Waiting.png'
 icon = Image.open(icon_path)
 tray_icon = pystray.Icon('Testing', icon, 'Testing...', menu=menu)
 
