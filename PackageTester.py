@@ -9,6 +9,13 @@ import configparser
 import pystray
 from PIL import Image
 
+#Open settings file
+def open_settings():
+    try:
+        os.startfile('Settings.txt')
+    except OSError:
+        print('Error: Could not open file')
+
 # Change system tray icon
 def icon_change(name):
     icon_path = os.path.join(sys._MEIPASS, name) if hasattr(sys, '_MEIPASS') else name
@@ -21,6 +28,8 @@ def on_right_click(icon, item):
         stop_ping_test = True
         icon.stop()
 
+def on_right_click_settings(icon, item):
+        open_settings()
 #Define ping test
 def ping_test():
     while not stop_ping_test:
@@ -83,7 +92,12 @@ def start_thread(icon):
 #Reads the current settings from the Settings.txt file.
 def read_settings():
     config = configparser.ConfigParser()
-    config.read('Settings.txt')
+    if hasattr(sys, '_MEIPASS'):
+        # If running from PyInstaller executable, use sys._MEIPASS to find Settings.txt
+        config.read(os.path.join(sys._MEIPASS, 'Settings.txt'))
+    else:
+        # If running from source code, use relative path to Settings.txt
+        config.read('Settings.txt')
 
     # Parse the settings
     ping_count = config.getint('Settings', 'ping_count')
@@ -94,8 +108,11 @@ def read_settings():
     # Return tuple
     return ping_count, seconds_between_pings, time_until_lost, server_to_ping
 
+
 # Set up system tray menu
-menu = pystray.Menu(pystray.MenuItem('Exit', on_right_click))
+menu = pystray.Menu(pystray.MenuItem('Settings', on_right_click_settings),
+                    pystray.MenuItem('Exit', on_right_click))
+
 
 # Fill variables with settings.txt
 ping_count, seconds_between_pings, time_until_lost, server_to_ping = read_settings()
@@ -104,6 +121,7 @@ ping_count, seconds_between_pings, time_until_lost, server_to_ping = read_settin
 icon_path = os.path.join(sys._MEIPASS, 'Icons', 'Waiting.png') if hasattr(sys, '_MEIPASS') else 'Icons/Waiting.png'
 icon = Image.open(icon_path)
 tray_icon = pystray.Icon('Testing', icon, 'Testing...', menu=menu)
+tray_icon.max_tooltip_width = 300
 
 # flag to signal the ping_test thread to exit the loop
 stop_ping_test = False
