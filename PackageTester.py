@@ -8,6 +8,8 @@ import sys
 import configparser
 import pystray
 from PIL import Image
+# Settings change flag for ping_test
+settings_changed = False
 
 #Open settings file
 def open_settings():
@@ -28,17 +30,26 @@ def on_right_click(icon, item):
         stop_ping_test = True
         icon.stop()
 
-def on_right_click_settings(icon, item):
+def on_right_click_settings(icon, item):        
+        global settings_changed
+        settings_changed = True
         open_settings()
 #Define ping test
-def ping_test():
+def ping_test():        
+    global settings_changed
+    global ping_count
+    global seconds_between_pings
+    global time_until_lost
+    global server_to_ping
     while not stop_ping_test:
+        if settings_changed:
+            ping_count, seconds_between_pings, time_until_lost, server_to_ping = read_settings()
+            settings_changed = False
         successful_pings = 0
         packet_loss = 0
         total_response_time = 0
         response_times = []
-        response_time = 0  # set default value
-        
+        response_time = 0  # set default value        
         #Run ping command x amount of times 3 times per second.
         for i in range(ping_count):
             result = subprocess.run(['ping', '-n', '1', '-w', str(time_until_lost), server_to_ping], stdout=subprocess.PIPE, creationflags = subprocess.CREATE_NO_WINDOW)
