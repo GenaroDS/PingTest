@@ -1,5 +1,6 @@
 [Settings]
-ping_count = 100
+ping_count = 30
 seconds_between_pings = 0.33
 time_until_lost = 150
 server_to_ping = google.com
+
