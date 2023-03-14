@@ -5,9 +5,9 @@ import subprocess
 import time
 import threading
 import sys
-
-from PIL import Image
+import configparser
 import pystray
+from PIL import Image
 
 # Change system tray icon
 def icon_change(name):
@@ -32,7 +32,7 @@ def ping_test():
         
         #Run ping command x amount of times 3 times per second.
         for i in range(ping_count):
-            result = subprocess.run(['ping', '-n', '1', '-w', '150', 'google.com'], stdout=subprocess.PIPE, creationflags = subprocess.CREATE_NO_WINDOW)
+            result = subprocess.run(['ping', '-n', '1', '-w', str(time_until_lost), server_to_ping], stdout=subprocess.PIPE, creationflags = subprocess.CREATE_NO_WINDOW)
             if 'Reply from' in str(result.stdout):
                 successful_pings += 1
                 # extract the response time from the output
@@ -43,7 +43,7 @@ def ping_test():
                 total_response_time += response_time
                 response_times.append(response_time)
                 packet_loss += 1            
-            time.sleep(0.33)
+            time.sleep(seconds_between_pings)
 
         packet_loss_percentage = (packet_loss / ping_count) * 100
 
@@ -58,7 +58,7 @@ def ping_test():
             max_response_time = 0
 
         # update the tooltip of the system tray icon with the statistics
-        tooltip = f'Packet loss: {packet_loss_percentage:.2f}%\nAverage: {average_response_time:.2f}ms\nMin: {min_response_time:.2f}ms\nMax: {max_response_time:.2f}ms\nSent: {successful_pings + packet_loss}'
+        tooltip = f'[Packet statistics]\nSent: {successful_pings + packet_loss}\nLost: {packet_loss} ({packet_loss_percentage:.2f}%)\nAvg. RTT: {average_response_time:.2f}ms\nMin. RTT: {min_response_time:.2f}ms\nMax. RTT: {max_response_time:.2f}ms'
         tray_icon.title = tooltip
 
         #Set the system tray icon depending on packet loss percentages
@@ -80,12 +80,25 @@ def start_thread(icon):
     t = threading.Thread(target=ping_test)
     t.start()
 
+#Reads the current settings from the Settings.txt file.
+def read_settings():
+    config = configparser.ConfigParser()
+    config.read('Settings.txt')
+
+    # Parse the settings
+    ping_count = config.getint('Settings', 'ping_count')
+    seconds_between_pings = config.getfloat('Settings', 'seconds_between_pings')
+    time_until_lost = config.getint('Settings', 'time_until_lost')
+    server_to_ping = config.get('Settings', 'server_to_ping')
+
+    # Return tuple
+    return ping_count, seconds_between_pings, time_until_lost, server_to_ping
 
 # Set up system tray menu
 menu = pystray.Menu(pystray.MenuItem('Exit', on_right_click))
 
-#Amount of pings
-ping_count = 100
+# Fill variables with settings.txt
+ping_count, seconds_between_pings, time_until_lost, server_to_ping = read_settings()
 
 # Set up system tray icon
 icon_path = os.path.join(sys._MEIPASS, 'Icons', 'Waiting.png') if hasattr(sys, '_MEIPASS') else 'Icons/Waiting.png'
