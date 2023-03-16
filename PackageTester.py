@@ -147,24 +147,43 @@ def read_settings():
 
     return ping_count, seconds_between_pings, max_response_time, server_to_ping, perfect_threshold, good_threshold, medium_threshold
 
-# Set up system tray icon and context menu
-menu = Menu(MenuItem('Settings', on_right_click_settings),
-            MenuItem('Exit', on_right_click))
 
-icon_path = path.join(path.dirname(path.abspath(__file__)), 'Icons', 'Waiting.png')
-icon = open_image(icon_path)
-tray_icon = Icon('Testing', icon, 'Testing...', menu=menu)
-tray_icon.max_tooltip_width = 350
+def setup_tray_icon():
+    global tray_icon
+    menu = Menu(MenuItem('Settings', on_right_click_settings),
+                MenuItem('Exit', on_right_click))
 
-# Start the ping Thread
-Thread(target=ping_test, args=(tray_icon,)).start()
+    ping_count, seconds_between_pings, max_response_time, server_to_ping, perfect_threshold, good_threshold, medium_threshold = read_settings()
+    estimated_test_time = ping_count * seconds_between_pings
+    ftooltip = (
+            f'[Performing test]\n'
+            f'To: {server_to_ping}\n'
+            f'Pings: {ping_count}\n'
+            f'Interval: {seconds_between_pings}s\n'
+            f'Timeout: {max_response_time}ms\n'
+            f'Est. test time: {estimated_test_time:.1f}s '
+        )
+    icon_path = path.join(path.dirname(path.abspath(__file__)), 'Icons', 'Waiting.png')
+    icon = open_image(icon_path)
+    tray_icon = Icon('Testing', icon, ftooltip, menu=menu)
+    tray_icon.max_tooltip_width = 350
 
-# Run icon on main thread
-try:
-    tray_icon.run()  # Run the system tray icon     
-except Exception as e:
-    print(f"Unexpected error occurred: {e}")
-finally:
-    tray_icon.stop()  # Stop the system tray icon
+    return tray_icon
+
+# Global variables
+settings_changed = True
+stop_ping_test = False
+
+if __name__ == "__main__":
+    # Start the ping Thread
+    tray_icon = setup_tray_icon()
+    Thread(target=ping_test, args=(tray_icon,)).start()
+    try:
+        tray_icon.run()  # Run the system tray icon     
+    except Exception as e:
+        print(f"Unexpected error occurred: {e}")
+    finally:
+        tray_icon.stop()  # Stop the system tray icon
+
     
     

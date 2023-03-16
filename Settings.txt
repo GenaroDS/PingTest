@@ -1,5 +1,5 @@
 [Settings]
-ping_count = 10
+ping_count = 100
 seconds_between_pings = 0.33
 max_response_time = 150
 server_to_ping = google.com
