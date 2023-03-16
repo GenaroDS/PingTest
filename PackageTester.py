@@ -3,9 +3,10 @@ from subprocess import run, PIPE, CREATE_NO_WINDOW
 from time import sleep
 from threading import Thread
 import sys
+import chardet
 from configparser import ConfigParser
 from pystray import Menu, MenuItem, Icon
-from PIL.Image import open
+from PIL.Image import open as open_image
 import re
 from os import path, getcwd 
 
@@ -21,10 +22,9 @@ def open_settings():
 
 # Change system tray icon
 def icon_change(name):
-    script_path = path.abspath(__file__)
-    script_folder = path.dirname(script_path) 
-    icon_path = path.join(script_folder, "Icons", name)  
-    image = open(icon_path)
+    script_folder = getcwd()
+    icon_path = path.join(script_folder, "Icons", name)
+    image = open_image(icon_path)
     tray_icon.icon = image
 
 # Stop ping test and icon main thread thread when click on exit
@@ -67,14 +67,17 @@ def ping_test(icon):
     global seconds_between_pings
     global time_until_lost
     global server_to_ping
+    global perfect_threshold
+    global good_threshold
+    global medium_threshold
 
     # Compile the regular expression pattern to extract the response time
-    response_time_pattern = re.compile(r'time(?:=|<)(\d+(?:\.\d+)?)ms')
+    response_time_pattern = re.compile(r'(\d+(?:\.\d+)?)ms')
 
     while not stop_ping_test:
         # Reload settings if modified
         if settings_changed:
-            ping_count, seconds_between_pings, time_until_lost, server_to_ping = read_settings()
+            ping_count, seconds_between_pings, time_until_lost, server_to_ping, perfect_threshold, good_threshold, medium_threshold  = read_settings()
             settings_changed = False
 
         # Initialize statistics variables
@@ -87,7 +90,10 @@ def ping_test(icon):
         i = 0
         while i < ping_count and not stop_ping_test:
             result = run(['ping', '-n', '1', '-w', str(time_until_lost), server_to_ping], stdout=PIPE, creationflags=CREATE_NO_WINDOW)
-            match = response_time_pattern.search(result.stdout.decode('utf-8'))
+            encoding = chardet.detect(result.stdout)['encoding']
+            decoded_output = result.stdout.decode(encoding)
+            match = response_time_pattern.search(decoded_output)
+
             if match:
                 successful_pings += 1
                 response_time = float(match.group(1))
@@ -105,11 +111,11 @@ def ping_test(icon):
         tray_icon.title = tooltip
 
         # Set the system tray accordingly
-        if packet_loss_percentage < 9:
+        if packet_loss_percentage < perfect_threshold:
             icon_change('Perfect.png')
-        elif packet_loss_percentage < 18:
+        elif packet_loss_percentage < good_threshold:
             icon_change('Good.png')
-        elif packet_loss_percentage < 28:
+        elif packet_loss_percentage < medium_threshold:
             icon_change('Medium.png')
         else:
             icon_change('Bad.png')
@@ -122,23 +128,31 @@ def read_settings():
         config["Settings"] = {
             "ping_count": "40",
             "seconds_between_pings": "0.33",
-            "time_until_lost": "150",
-            "server_to_ping": "google.com"
+            "max_response_time": "150",
+            "server_to_ping": "google.com",
+            "perfect_threshold": "9",
+            "good_threshold": "18",
+            "medium_threshold": "28"
         }
         with open(config_file, "w") as file:
             config.write(file)
     config.read(config_file)
     ping_count = int(config["Settings"]["ping_count"])
     seconds_between_pings = float(config["Settings"]["seconds_between_pings"])
-    time_until_lost = int(config["Settings"]["time_until_lost"])
+    max_response_time = int(config["Settings"]["max_response_time"])
     server_to_ping = config["Settings"]["server_to_ping"]
-    return ping_count, seconds_between_pings, time_until_lost, server_to_ping
+    perfect_threshold = int(config["Settings"]["perfect_threshold"])
+    good_threshold = int(config["Settings"]["good_threshold"])
+    medium_threshold = int(config["Settings"]["medium_threshold"])
+
+    return ping_count, seconds_between_pings, max_response_time, server_to_ping, perfect_threshold, good_threshold, medium_threshold
 
 # Set up system tray icon and context menu
 menu = Menu(MenuItem('Settings', on_right_click_settings),
-                    MenuItem('Exit', on_right_click))
+            MenuItem('Exit', on_right_click))
+
 icon_path = path.join(path.dirname(path.abspath(__file__)), 'Icons', 'Waiting.png')
-icon = open(icon_path)
+icon = open_image(icon_path)
 tray_icon = Icon('Testing', icon, 'Testing...', menu=menu)
 tray_icon.max_tooltip_width = 350
 

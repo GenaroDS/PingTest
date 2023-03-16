@@ -1,6 +1,8 @@
 [Settings]
-ping_count = 50
+ping_count = 10
 seconds_between_pings = 0.33
-time_until_lost = 150
+max_response_time = 150
 server_to_ping = google.com
-
+perfect_threshold = 9
+good_threshold = 18
+medium_threshold = 28
