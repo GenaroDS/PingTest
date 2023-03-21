@@ -2,7 +2,6 @@ from os import path
 from subprocess import run, PIPE, CREATE_NO_WINDOW
 from time import sleep
 from threading import Thread
-import sys
 import chardet
 from configparser import ConfigParser
 from pystray import Menu, MenuItem, Icon
@@ -90,10 +89,12 @@ def ping_test(icon):
         i = 0
         while i < ping_count and not stop_ping_test:
             result = run(['ping', '-n', '1', '-w', str(time_until_lost), server_to_ping], stdout=PIPE, creationflags=CREATE_NO_WINDOW)
+            
             encoding = chardet.detect(result.stdout)['encoding']
             decoded_output = result.stdout.decode(encoding)
+            print(decoded_output)
             match = response_time_pattern.search(decoded_output)
-
+            sleep(10)
             if match:
                 successful_pings += 1
                 response_time = float(match.group(1))
@@ -147,7 +148,7 @@ def read_settings():
 
     return ping_count, seconds_between_pings, max_response_time, server_to_ping, perfect_threshold, good_threshold, medium_threshold
 
-
+# Set up system tray icon and context menu
 def setup_tray_icon():
     global tray_icon
     menu = Menu(MenuItem('Settings', on_right_click_settings),
