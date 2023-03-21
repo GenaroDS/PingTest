@@ -16,13 +16,12 @@ Colors represent different packet loss percentages: blue (<9%), green (<18%), ye
 PingTest allows you to effortlessly monitor your internet connection's stability, identifying potential issues while you use your computer normally.
 
 <style>
+  .image-container {
+    display: flex;
+    justify-content: space-between;
+  }
   img {
     display: inline-block;
-    margin-right: 10rm;
     vertical-align: middle;
-  }
-  /* Para eliminar el margen de la última imagen */
-  img:last-child {
-    margin-right: 0;
   }
 </style>
