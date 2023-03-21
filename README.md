@@ -8,10 +8,10 @@ A ping test measures the speed and stability of an internet connection by sendin
 ## Screenshots
 The system tray icon changes color based on connection stability:
 
-<img src="Screenshots/Blue circle.jpg" alt="BlueCricle">&nbsp;&nbsp;&nbsp;
-<img src="Screenshots/Green circle.jpg" alt="GreenCircle">&nbsp;&nbsp;&nbsp;
-<img src="Screenshots/Yellow circle.jpg" alt="YellowCircle">&nbsp;&nbsp;&nbsp;
-<img src="Screenshots/Red circle.jpg" alt="RedCircle">&nbsp;&nbsp;&nbsp;
+<img src="Screenshots/Blue circle.jpg" alt="BlueCricle">&nbsp;
+<img src="Screenshots/Green circle.jpg" alt="GreenCircle">&nbsp;
+<img src="Screenshots/Yellow circle.jpg" alt="YellowCircle">&nbsp;
+<img src="Screenshots/Red circle.jpg" alt="RedCircle">&nbsp;&nbsp;
 <img src="Screenshots/Testing.jpg" alt="Testing...">
 
 Colors represent different packet loss percentages: blue (<9%), green (<18%), yellow (<28%), and red (>=28%). Through the settings window, you can customize each threshold to your preference. The clock icon appears initially, awaiting results
