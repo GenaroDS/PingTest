@@ -14,7 +14,8 @@ The system tray icon changes color based on connection stability:
 <img src="Screenshots/Red circle.jpg" alt="RedCircle">&nbsp;&nbsp;
 <img src="Screenshots/Testing.jpg" alt="Testing...">
 
-Colors represent different packet loss percentages: blue (<9%), green (<18%), yellow (<28%), and red (>=28%). Through the settings window, you can customize each threshold to your preference. The clock icon appears initially, awaiting results
+Colors represent different packet loss percentages: blue (<9%), green (<18%), yellow (<28%), and red (>=28%).  
+Through the settings window, you can customize each threshold to your preference. The clock icon appears initially, awaiting results
 
 ## Conclusion
 PingTest allows you to effortlessly monitor your internet connection's stability, identifying potential issues while you use your computer normally.
