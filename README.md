@@ -18,7 +18,7 @@ PingTest allows you to effortlessly monitor your internet connection's stability
 <style>
   img {
     display: inline-block;
-    margin-right: 10px;
+    margin-right: 10rm;
     vertical-align: middle;
   }
   /* Para eliminar el margen de la última imagen */
