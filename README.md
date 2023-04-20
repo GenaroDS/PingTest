@@ -24,7 +24,7 @@ PingTest allows you to effortlessly monitor your internet connection's stability
 ## Instalation
 
 1 - Clone the repository or download the project files:
-''' git clone https://github.com/GenaroDS/PingTest.git'''  
+``` git clone https://github.com/GenaroDS/PingTest.git```  
 2 - Install Python, if not already installed. The user can download the Python installer from the official website: https://www.python.org/downloads/  
 3 - Install the required dependencies: Open a terminal or command prompt, navigate to the project folder, and run the following command:
 '''pip install chardet pystray pillow configparser'''  
