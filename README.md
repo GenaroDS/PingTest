@@ -31,6 +31,6 @@ PingTest allows you to effortlessly monitor your internet connection's stability
 ```pip install chardet pystray pillow configparser```   
 4 - If you don't have pyinstallar intalled already, you can do so by running the following command in the terminal or command prompt:  
 ```pip install pyinstaller```  
-5 - Create the executable by the terminal or command prompt, navigate to the folder containing the PackageTester.py script and run the following command to create a standalone executable file along with the required resources:  
+5 - Create the executable using the terminal or command prompt. Navigate to the folder containing the PackageTester.py script and run the following command to create a standalone executable file along with the required resources:  
 ```pyinstaller --noconsole --add-data "Icons/*;Icons/" --add-data "Settings.txt;." PackageTester.py ```  
 6 - Locate the .exe inside the dist folder and run it.
