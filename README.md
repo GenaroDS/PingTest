@@ -21,17 +21,16 @@ The clock icon appears initially, awaiting results.
 ## Conclusion
 PingTest allows you to effortlessly monitor your internet connection's stability, identifying potential issues while you use your computer normally.
 
-## Instalation
+## Installation
 
 1 - Clone the repository or download the project files:  
 ```git clone https://github.com/GenaroDS/PingTest.git```  
 2 - Install Python, if not already installed, download the Python installer from the official website:  
 ``` https://www.python.org/downloads/ ```  
-3 - Install the required dependencies: Open a terminal or command prompt, navigate to the project folder, and run the following command:  
+3 - Install the required dependencies using terminal or command prompt, navigate to the project folder, and run the following command:  
 ```pip install chardet pystray pillow configparser```   
-4 - Install pyinstaller: If the user hasn't installed pyinstaller already, they can do so by running the following command in the terminal or command prompt:  
+4 - If you don't have pyinstallar intalled already, you can do so by running the following command in the terminal or command prompt:  
 ```pip install pyinstaller```  
-5 - Create the executable:  
-In the terminal or command prompt, navigate to the folder containing the PackageTester.py script and run the following command to create a standalone executable file along with the required resources:  
+5 - Create the executable by the terminal or command prompt, navigate to the folder containing the PackageTester.py script and run the following command to create a standalone executable file along with the required resources:  
 ```pyinstaller --noconsole --add-data "Icons/*;Icons/" --add-data "Settings.txt;." PackageTester.py ```  
 6 - Locate the .exe inside the dist folder and run it.
