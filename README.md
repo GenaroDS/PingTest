@@ -24,11 +24,14 @@ PingTest allows you to effortlessly monitor your internet connection's stability
 ## Instalation
 
 1 - Clone the repository or download the project files:
-``` git clone https://github.com/GenaroDS/PingTest.git```  
-2 - Install Python, if not already installed. The user can download the Python installer from the official website: https://www.python.org/downloads/  
+```git clone https://github.com/GenaroDS/PingTest.git```  
+2 - Install Python, if not already installed, download the Python installer from the official website:
+``` https://www.python.org/downloads/ ``` 
 3 - Install the required dependencies: Open a terminal or command prompt, navigate to the project folder, and run the following command:
-'''pip install chardet pystray pillow configparser'''  
+```pip install chardet pystray pillow configparser```  
 4 - Install pyinstaller: If the user hasn't installed pyinstaller already, they can do so by running the following command in the terminal or command prompt:
-'''pip install pyinstaller'''
+```pip install pyinstaller```
 5 - Create the executable:
-In the terminal or command prompt, navigate to the folder containing the ping_test.py script and run the following command to create a standalone executable file along with the required resources:
+In the terminal or command prompt, navigate to the folder containing the PackageTester.py script and run the following command to create a standalone executable file along with the required resources:
+```pyinstaller --noconsole --add-data "Icons/*;Icons/" --add-data "Settings.txt;." PackageTester.py ```
+6 - Locate the excecutable inside the dist folder and excecute it.
