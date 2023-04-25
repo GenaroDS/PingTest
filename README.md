@@ -34,3 +34,7 @@ PingTest allows you to effortlessly monitor your internet connection's stability
 5 - Create the executable using the terminal or command prompt. Navigate to the folder containing the PackageTester.py script and run the following command to create a standalone executable file along with the required resources:  
 ```pyinstaller --noconsole --add-data "Icons/*;Icons/" --add-data "Settings.txt;." PackageTester.py ```  
 6 - Locate the .exe inside the dist folder and run it.
+
+## Alternatively
+
+You can also download the PackageTester.rar file and just run the .exe.
