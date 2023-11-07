@@ -8,9 +8,33 @@ A ping test measures the speed and stability of an internet connection by sendin
 ## Screenshots
 The system tray icon changes color based on connection stability:
 
-<img src="Screenshots/Blue circle.jpg" alt="BlueCricle"> <img src="Screenshots/Green circle.jpg" alt="GreenCircle"> <img src="Screenshots/Yellow circle.jpg" alt="YellowCircle"> <img src="Screenshots/Red circle.jpg" alt="RedCircle"> <img src="Screenshots/Testing.jpg" alt="Testing...">
+<img src="Screenshots/Blue circle.jpg" alt="BlueCricle">&nbsp;
+<img src="Screenshots/Green circle.jpg" alt="GreenCircle">&nbsp;
+<img src="Screenshots/Yellow circle.jpg" alt="YellowCircle">&nbsp;
+<img src="Screenshots/Red circle.jpg" alt="RedCircle">&nbsp;&nbsp;
+<img src="Screenshots/Testing.jpg" alt="Testing...">
 
-Colors represent different packet loss percentages: blue (<9%), green (<18%), yellow (<28%), and red (>=28%). Through the settings window, you can customize each threshold to your preference. The clock icon appears initially, awaiting results
+Colors represent different packet loss percentages: blue (<9%), green (<18%), yellow (<28%), and red (>=28%).  
+Through the settings window, you can customize each threshold to your preference.  
+The clock icon appears initially, awaiting results.
 
-Conclusion
+## Conclusion
 PingTest allows you to effortlessly monitor your internet connection's stability, identifying potential issues while you use your computer normally.
+
+## Installation
+
+1 - Clone the repository or download the project files:  
+```git clone https://github.com/GenaroDS/PingTest.git```  
+2 - Install Python, if not already installed, download the Python installer from the official website:  
+``` https://www.python.org/downloads/ ```  
+3 - Install the required dependencies using terminal or command prompt, navigate to the project folder, and run the following command:  
+```pip install chardet pystray pillow configparser```   
+4 - If you don't have pyinstallar intalled already, you can do so by running the following command in the terminal or command prompt:  
+```pip install pyinstaller```  
+5 - Create the executable using the terminal or command prompt. Navigate to the folder containing the PackageTester.py script and run the following command to create a standalone executable file along with the required resources:  
+```pyinstaller --noconsole --add-data "Icons/*;Icons/" --add-data "Settings.txt;." PackageTester.py ```  
+6 - Locate the .exe inside the dist folder and run it.
+
+## Alternatively
+
+You can also download the PackageTester.rar file and just run the .exe.
