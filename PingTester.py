@@ -9,16 +9,13 @@ import chardet
 from configparser import ConfigParser
 from pystray import Menu, MenuItem, Icon
 from PIL.Image import open as open_image
+from PIL import ImageTk
 import re
 import json
 import winreg as reg
 import webbrowser
 from os import path, getcwd 
 
-# Set flags for ping_test
-settings_changed = True          
-stop_ping_test = False
-settings_window_instance = None
 
 def set_value_in_file(key, value):
     config_file = "settings.json"
@@ -84,13 +81,15 @@ def apply_changes(entries):
     try:
         set_reg_value('Settings', config_to_save)
         print("Changes applied to registry")
-        global settings_changed    
+        global settings_changed
         settings_changed = True
     except OSError as e:
         print(f"Failed to write to registry: {e}, saving to file instead.")
         for key, value in config_to_save.items():
             set_value_in_file(key, value)
         print("Changes applied to file")
+        
+        
 def open_settings_window():
     global settings_window_instance
 
@@ -105,6 +104,11 @@ def open_settings_window():
     # Create the main window and assign it to the global variable
     settings_window_instance = ctk.CTk()
     settings_window_instance.title("Settings")
+
+
+    #Set Settings window icon
+    icon_path = 'Icons/Perfect.ico'  # Ensure this path is correct
+    settings_window_instance.iconbitmap(icon_path)
 
     entries = {}  # Dictionary to store the Entry widgets
     default_config = {
@@ -134,9 +138,12 @@ def open_settings_window():
         entry.grid(row=i, column=1, padx=10, pady=5)
         entries[key] = entry
 
+
     # Add the button to apply changes
-    apply_button = ctk.CTkButton(settings_window_instance, text="Apply Changes", command=lambda: apply_changes(entries))
+    apply_button = ctk.CTkButton(settings_window_instance, text="Apply changes", command=lambda: apply_changes(entries))
     apply_button.grid(row=len(default_config), column=0, columnspan=2, pady=(7, 14))
+    
+    
 
     # After setting up the window, update the window to calculate the size
     settings_window_instance.update_idletasks()
@@ -168,12 +175,6 @@ def open_settings_window():
     # Start the Tkinter event loop
     settings_window_instance.resizable(False, False)
     settings_window_instance.mainloop()
-
-# Open settings file
-def open_settings():
-    global settings_changed
-    run(["notepad.exe", "Settings.txt"])
-    settings_changed = True
 
 # Change system tray icon
 def icon_change(name):
@@ -261,7 +262,6 @@ def ping_test(icon):
                 response_times.append(response_time)
                 packet_loss += 1
             sleep(seconds_between_pings)
-
             i += 1
 
         # Update tooltip with newer statistics
@@ -296,7 +296,7 @@ def read_settings():
         with reg.OpenKey(reg.HKEY_CURRENT_USER, registry_path, 0, reg.KEY_READ) as registry_key:
             settings_str, _ = reg.QueryValueEx(registry_key, 'Settings')
             settings = json.loads(settings_str)  # Deserialize the JSON string to a dictionary
-    except (FileNotFoundError, OSError, json.JSONDecodeError):
+    except (OSError, json.JSONDecodeError):
         print("Registry entry not found or invalid. Using default settings.")
         settings = default_settings  # Use default settings without saving them to the registry
 
@@ -319,8 +319,9 @@ def on_right_click_coffe(_=None):
 
 def setup_tray_icon():
     global tray_icon
-    menu = Menu(MenuItem('Settings', on_right_click_settings),
-                #MenuItem('Like the app? Buy me a coffee!☕', on_right_click_coffe),
+    menu = Menu(MenuItem('Like the app? Buy me a coffee!',
+                         on_right_click_coffe),MenuItem('Settings', on_right_click_settings),
+                
                 MenuItem('Exit', on_right_click_exit))
     
     ping_count, seconds_between_pings, max_response_time, server_to_ping, perfect_threshold, good_threshold, medium_threshold = read_settings()
@@ -343,6 +344,7 @@ def setup_tray_icon():
 # Global variables
 settings_changed = True
 stop_ping_test = False
+settings_window_instance = None
 
 if __name__ == "__main__":
     # Start the ping Thread    
