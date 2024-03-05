@@ -76,8 +76,6 @@ def apply_changes(entries):
     config_to_save = {}
     for key in entries:
         config_to_save[key] = entries[key].get()
-
-    # Attempt to save to the registry, fallback to file if there's an error
     try:
         set_reg_value('Settings', config_to_save)
         print("Changes applied to registry")
@@ -89,27 +87,34 @@ def apply_changes(entries):
             set_value_in_file(key, value)
         print("Changes applied to file")
         
+def open_settings_window_in_thread():
+    def run_settings_window():
+        open_settings_window()  # This is your existing function to open the settings window
+
+    settings_thread = Thread(target=run_settings_window)
+    settings_thread.setDaemon(True)  # Optionally set as a daemon thread so it closes when the main program exits
+    settings_thread.start()
         
 def open_settings_window():
     global settings_window_instance
+    def run_window_operations():
+        if settings_window_instance and settings_window_instance.winfo_exists():
+            # Aquí puedes colocar el código que interactúa con la ventana de configuración
+            # Por ejemplo, actualizar widgets, cambiar estados, etc.
+            pass
 
-    # Check if the settings window is already open
-    if settings_window_instance is not None:
-        settings_window_instance.lift()  # Bring the already open window to the front
-        return
-
-    # Initialize CustomTkinter
+    if settings_window_instance is not None and settings_window_instance.winfo_exists():
+        settings_window_instance.lift()
+        settings_window_instance.after(0, run_window_operations)
+    else:
+        # Si la instancia de la ventana no existe, crea una nueva
+        settings_window_instance = ctk.CTk()
+        settings_window_instance.title("Settings")
+        icon_path = 'Icons/Perfect.ico'
+        settings_window_instance.iconbitmap(icon_path)
+        
     ctk.set_appearance_mode("Dark")
     
-    # Create the main window and assign it to the global variable
-    settings_window_instance = ctk.CTk()
-    settings_window_instance.title("Settings")
-
-
-    #Set Settings window icon
-    icon_path = 'Icons/Perfect.ico'  # Ensure this path is correct
-    settings_window_instance.iconbitmap(icon_path)
-
     entries = {}  # Dictionary to store the Entry widgets
     default_config = {
         "ping_count": 10,
@@ -166,14 +171,12 @@ def open_settings_window():
 
     # Properly handle window closure
     def on_close():
-        global settings_window_instance
-        settings_window_instance.destroy()
-        settings_window_instance = None  # Reset the global variable to allow reopening
+            global settings_window_instance
+            settings_window_instance.destroy()
+            settings_window_instance = None
 
     settings_window_instance.protocol("WM_DELETE_WINDOW", on_close)
-
-    # Start the Tkinter event loop
-    settings_window_instance.resizable(False, False)
+    settings_window_instance.after(0, run_window_operations)
     settings_window_instance.mainloop()
 
 # Change system tray icon
@@ -191,7 +194,10 @@ def on_right_click_exit(icon, item):
 
 #Create a third thread when settings is opened
 def on_right_click_settings(icon, item):
-    Thread(target=open_settings_window, args=()).start()
+    if settings_window_instance is not None and settings_window_instance.winfo_exists():
+        settings_window_instance.after(0, open_settings_window)
+    else:
+        open_settings_window()
 
 #Updates tooltip statstics
 def update_statistics(successful_pings, packet_loss, response_times):
@@ -347,15 +353,14 @@ stop_ping_test = False
 settings_window_instance = None
 
 if __name__ == "__main__":
-    # Start the ping Thread    
     tray_icon = setup_tray_icon()
     Thread(target=ping_test, args=(tray_icon,)).start()
     try:
-        tray_icon.run()  # Run the system tray icon     
+        tray_icon.run()
     except Exception as e:
         print(f"Unexpected error occurred: {e}")
     finally:
-        tray_icon.stop()  # Stop the system tray icon
+        tray_icon.stop()
 
     
     
