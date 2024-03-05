@@ -1,5 +1,7 @@
 from os import path
 import tkinter as tk
+import sys
+import os
 from tkinter import ttk
 import customtkinter as ctk
 from subprocess import run, PIPE, CREATE_NO_WINDOW
@@ -117,9 +119,8 @@ def open_settings_window():
     ctk.set_appearance_mode("Dark")
     settings_window_instance = ctk.CTk()
     settings_window_instance.title("Settings")
-    script_folder = getcwd()
-    icon_path = path.join(script_folder, "Icons", 'Perfect.ico')
-    settings_window_instance.after(201, lambda :settings_window_instance.iconbitmap(icon_path))
+    icon_path = get_icon_path('Perfect.ico')
+    settings_window_instance.after(201, lambda: settings_window_instance.iconbitmap(icon_path))
 
     entries = {}
     default_config = {
@@ -177,12 +178,21 @@ def icon_change(name):
     tray_icon.icon = image
     
 def icon_change_safe(name):
-    global tray_icon
-    if tray_icon is not None:
-        script_folder = getcwd()
-        icon_path = path.join(script_folder, "Icons", name)
+    if 'tray_icon' in globals() and tray_icon is not None:
+        icon_path = get_icon_path(name)
         image = open_image(icon_path)
         tray_icon.icon = image
+        
+def get_icon_path(icon_name):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        # Si estamos ejecutando el archivo .exe empaquetado
+        base_path = sys._MEIPASS
+    else:
+        # Si estamos ejecutando el script .py
+        base_path = script_dir
+    icon_path = os.path.join(base_path, 'Icons', icon_name)
+    return icon_path
 
 # Stop ping test and icon main thread thread when click on exit
 def on_right_click_exit(icon, item):
