@@ -18,6 +18,7 @@ import json
 import winreg as reg
 import webbrowser
 from os import path, getcwd 
+import io
 
 
 def set_value_in_file(key, value):
@@ -119,9 +120,12 @@ def open_settings_window():
     ctk.set_appearance_mode("Dark")
     settings_window_instance = ctk.CTk()
     settings_window_instance.title("Settings")
+    tabs = ctk.CTkTabview(settings_window_instance)
+    tabs.pack(fill="both", padx=10, pady=(0,11))
     icon_path = get_icon_path('Perfect.ico')
     settings_window_instance.after(201, lambda: settings_window_instance.iconbitmap(icon_path))
-
+    config_tab = tabs.add("Configuration")
+    
     entries = {}
     default_config = {
         "ping_count": 10,
@@ -141,15 +145,15 @@ def open_settings_window():
         stored_config = default_config
 
     for i, (key, default) in enumerate(default_config.items()):
-        label = ctk.CTkLabel(settings_window_instance, text=key.replace('_', ' ').capitalize() + ":")
+        label = ctk.CTkLabel(config_tab, text=key.replace('_', ' ').capitalize() + ":")
         label.grid(row=i, column=0, padx=10, pady=5, sticky="w")
         value = stored_config.get(key, default)
-        entry = ctk.CTkEntry(settings_window_instance, textvariable=ctk.StringVar(value=str(value)))
+        entry = ctk.CTkEntry(config_tab, textvariable=ctk.StringVar(value=str(value)))
         entry.grid(row=i, column=1, padx=10, pady=5)
         entries[key] = entry
 
-    apply_button = ctk.CTkButton(settings_window_instance, text="Apply changes", command=lambda: apply_changes(entries))
-    apply_button.grid(row=len(default_config), column=0, columnspan=2, pady=(5, 9))
+    apply_button = ctk.CTkButton(config_tab, text="Apply changes", command=lambda: apply_changes(entries))
+    apply_button.grid(row=len(default_config), column=0, columnspan=2, pady=(7, 5))
 
     settings_window_instance.update_idletasks()
     window_width = settings_window_instance.winfo_reqwidth()
@@ -199,12 +203,13 @@ def on_right_click_exit(icon, item):
     global stop_ping_test
     stop_ping_test = True
     icon.stop()
+    
 
 def on_right_click_settings(icon, item):
     Thread(target=open_settings_window).start()
 
 #Updates tooltip statstics
-def update_statistics(successful_pings, packet_loss, response_times):
+def update_statistics(successful_pings, packet_loss, response_times,server_to_ping):
     if successful_pings > 0:
         average_response_time = sum(response_times) / successful_pings
         min_response_time = min(response_times)
@@ -219,13 +224,14 @@ def update_statistics(successful_pings, packet_loss, response_times):
         f'[Packet statistics]\n'
         f'Sent: {successful_pings + packet_loss}\n'
         f'Lost: {packet_loss} ({packet_loss_percentage:.2f}%)\n'
+        f'To: {server_to_ping} \n'
         f'Avg. RTT: {average_response_time:.2f}ms\n'
         f'Min. RTT: {min_response_time:.2f}ms\n'
         f'Max. RTT: {max_response_time:.2f}ms'
     )
     return tooltip
 
-def update_statistics_safe(successful_pings, packet_loss, response_times):
+def update_statistics_safe(successful_pings, packet_loss, response_times,server_to_ping):
     if successful_pings > 0:
         average_response_time = sum(response_times) / successful_pings
         min_response_time = min(response_times)
@@ -240,6 +246,7 @@ def update_statistics_safe(successful_pings, packet_loss, response_times):
         f'[Packet statistics]\n'
         f'Sent: {successful_pings + packet_loss}\n'
         f'Lost: {packet_loss} ({packet_loss_percentage:.2f}%)\n'
+        f'To: {server_to_ping} \n'
         f'Avg. RTT: {average_response_time:.2f}ms\n'
         f'Min. RTT: {min_response_time:.2f}ms\n'
         f'Max. RTT: {max_response_time:.2f}ms'
@@ -289,7 +296,7 @@ def ping_test(icon):
             icon_change_safe('Medium.png')
         else:
             icon_change_safe('Bad.png')
-        update_statistics_safe(successful_pings, packet_loss, response_times)
+        update_statistics_safe(successful_pings, packet_loss, response_times, server_to_ping)
 
 #Reads the current settings from the Settings.txt file.
 def read_settings():
