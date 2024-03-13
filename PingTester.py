@@ -188,13 +188,15 @@ def icon_change_safe(name):
         tray_icon.icon = image
         
 def get_icon_path(icon_name):
-    script_dir = os.path.dirname(os.path.abspath(__file__))
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         # Si estamos ejecutando el archivo .exe empaquetado
         base_path = sys._MEIPASS
     else:
-        # Si estamos ejecutando el script .py
-        base_path = script_dir
+        # Si estamos ejecutando el script .py o de otra forma que no defina __file__
+        if '__file__' in globals():
+            base_path = os.path.dirname(os.path.abspath(__file__))
+        else:
+            base_path = os.path.dirname(os.path.abspath(sys.argv[0]))
     icon_path = os.path.join(base_path, 'Icons', icon_name)
     return icon_path
 
@@ -203,6 +205,7 @@ def on_right_click_exit(icon, item):
     global stop_ping_test
     stop_ping_test = True
     icon.stop()
+    
     
 
 def on_right_click_settings(icon, item):
@@ -278,7 +281,8 @@ def ping_test(icon):
             decoded_output = result.stdout.decode(encoding)
             match = response_time_pattern.search(decoded_output)
             sleep(seconds_between_pings)
-            print(decoded_output + "Pinging to: " +server_to_ping)
+            #print(decoded_output + "Pinging to: " +server_to_ping)
+            print("Pinging to: " + server_to_ping)
             if match:
                 successful_pings += 1
                 response_time = float(match.group(1))
@@ -371,11 +375,13 @@ if __name__ == "__main__":
     tray_icon = setup_tray_icon()
     Thread(target=lambda: ping_test(tray_icon)).start()
     try:
+        print("Sale por 0")
         tray_icon.run()
     except Exception as e:
         print(f"Unexpected error occurred: {e}")
     finally:
         tray_icon.stop()
+        os._exit(1)
 
     
     
